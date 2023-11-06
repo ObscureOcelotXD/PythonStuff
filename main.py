@@ -1,23 +1,34 @@
+import tkinter as tk
+from tkinter import filedialog
+import os
+import pdfToMp3Convert as convert
 
-import pyttsx3,PyPDF2,re
+# Create a function to handle the file selection
+def select_file():
+    file_path = filedialog.askopenfilename(filetypes=[("PDF files", "*.pdf")])
+    if file_path:
+        if file_path.endswith(".pdf"):
+            selected_file.set(file_path)
+            convert.convertPdfToMp3(selected_file.get())
+        else:
+            selected_file.set("Selected file is not a PDF")
+    else:
+        selected_file.set("No file selected")
 
-#to get your pdf read all you have to do is put the file in the same folder as this main.py file and then add the name of the file to the bookname variable
-bookName = "The_Art_Of_War"
-pdfreader = PyPDF2.PdfReader(open(bookName + '.pdf','rb'))
-speaker = pyttsx3.init()
-clean_text = ""
+# Create the main window
+root = tk.Tk()
+root.title("PDF File Selector")
 
-for page_num in range(len(pdfreader.pages)):
-    text = pdfreader.pages[page_num].extract_text()
+# Create a StringVar to store the selected file path
+selected_file = tk.StringVar()
 
-    textCleanedOne = text.strip().replace('\n',' ')
-    textCleanedTwo = re.sub(r"\/[G]\d{2}","",textCleanedOne)
-    textCleanedThree = re.sub(r"\/[G]\d{1}\w{1}","",textCleanedTwo)
-    textCleanedFour = re.sub(r"\/[G]\w{1}\d{1}","",textCleanedThree)
-    clean_text += textCleanedFour
-    print(clean_text)
+# Create a label to display the selected file path
+file_label = tk.Label(root, textvariable=selected_file)
+file_label.pack()
 
-speaker.save_to_file(clean_text,bookName + '.mp3')
-speaker.runAndWait()
+# Create a button to open the file dialog
+select_button = tk.Button(root, text="Select PDF File", command=select_file)
+select_button.pack()
 
-speaker.stop()
+# Start the main event loop
+root.mainloop()
